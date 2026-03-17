@@ -3,14 +3,14 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import os
 from dataclasses import dataclass
 from pathlib import Path
 
 import cv2
 import numpy as np
 
-from fit_ap_ellipse_manual import (
-    DEFAULT_TRANSITION_INCREASE_PCT,
+from heartvolume.imaging.automaticTracking.fit_ap_ellipse_manual import (
     FreehandEllipseTool,
     Ellipse,
     ellipse_to_dict,
@@ -18,8 +18,10 @@ from fit_ap_ellipse_manual import (
     refine_ellipse_with_image,
 )
 
-DEFAULT_VIDEO = "data/Dendo_video_AP.mp4"
-DEFAULT_OUTPUT_DIR = Path("output/ap_ellipse_tracking")
+# Path resolution to be independent of current working directory or script location
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent
+DEFAULT_VIDEO = str(PROJECT_ROOT / "data" / "2nd Session" / "Dendo_video_AP.mp4")
+DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "output" / "automatic_ellipse_tracking"
 
 
 @dataclass
@@ -97,8 +99,11 @@ def _angle_lerp_deg(a_prev: float, a_new: float, alpha: float) -> float:
 
 def smooth_ellipse(prev: Ellipse, current: Ellipse, frame_shape: tuple[int, int, int], alpha: float = 0.52) -> Ellipse:
     h, w = frame_shape[:2]
-    max_center_jump = 0.16 * float(min(h, w))
-    max_axis_ratio_delta = 0.42
+    # More freedom on center motion while keeping axis stability guardrails.
+    max_center_jump = 0.26 * float(min(h, w))
+    max_axis_ratio_delta = 0.55
+    center_alpha = 0.72
+    axis_alpha = 0.60
 
     (pcx, pcy), (pmaj, pmin), pang = prev
     (ccx, ccy), (cmaj, cmin), cang = current
@@ -118,11 +123,11 @@ def smooth_ellipse(prev: Ellipse, current: Ellipse, frame_shape: tuple[int, int,
     cmaj = float(np.clip(cmaj, maj_low, maj_high))
     cmin = float(np.clip(cmin, min_low, min_high))
 
-    scx = (1.0 - alpha) * pcx + alpha * ccx
-    scy = (1.0 - alpha) * pcy + alpha * ccy
-    smaj = (1.0 - alpha) * pmaj + alpha * cmaj
-    smin = (1.0 - alpha) * pmin + alpha * cmin
-    sang = _angle_lerp_deg(float(pang), float(cang), alpha)
+    scx = (1.0 - center_alpha) * pcx + center_alpha * ccx
+    scy = (1.0 - center_alpha) * pcy + center_alpha * ccy
+    smaj = (1.0 - axis_alpha) * pmaj + axis_alpha * cmaj
+    smin = (1.0 - axis_alpha) * pmin + axis_alpha * cmin
+    sang = _angle_lerp_deg(float(pang), float(cang), axis_alpha)
 
     return ((float(scx), float(scy)), (float(smaj), float(smin)), float(sang))
 

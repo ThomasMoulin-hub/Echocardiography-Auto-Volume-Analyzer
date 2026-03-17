@@ -1,12 +1,12 @@
 import cv2
-from main import detect_scale_on_frame
+from heartvolume.imaging.scale_detection import detect_scale_on_frame
 
 images = [
-    'data/demo_Lendo_ED.PNG',
-    'data/demo_Lendo_ES.PNG',
-    'data/demo_Dendo_ED_MV.PNG',
-    'data/demo_Dendo_ED_PM.PNG',
-    'data/demo_Dendo_ED_AP.PNG'
+    '../data/2nd Session/demo_Lendo_ED.PNG',
+    '../data/2nd Session/demo_Lendo_ES.PNG',
+    '../data/2nd Session/demo_Dendo_ED_MV.PNG',
+    '../data/2nd Session/demo_Dendo_ED_PM.PNG',
+    '../data/2nd Session/demo_Dendo_ED_AP.PNG'
 ]
 
 for path in images:

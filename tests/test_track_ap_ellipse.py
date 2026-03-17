@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from track_ap_ellipse_all_frames import circle_seed_points_from_ellipse, smooth_ellipse
+from heartvolume.imaging.automaticTracking.track_ap_ellipse_all_frames import circle_seed_points_from_ellipse, smooth_ellipse
 
 
 def test_circle_seed_points_from_ellipse() -> None:

@@ -2,14 +2,17 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
 from typing import Optional, Sequence
 
 import cv2
 import numpy as np
 
-DEFAULT_VIDEO = "data/Dendo_video_AP.mp4"
-OUTPUT_DIR = Path("output/ap_ellipse_fit")
+# Path resolution to be independent of current working directory or script location
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent
+DEFAULT_VIDEO = str(PROJECT_ROOT / "data" / "2nd Session" / "Dendo_video_AP.mp4")
+OUTPUT_DIR = PROJECT_ROOT / "output" / "manual_ellipse_fit"
 Ellipse = tuple[tuple[float, float], tuple[float, float], float]
 DEFAULT_TRANSITION_INCREASE_PCT = 20
 MAX_TRANSITION_INCREASE_PCT = 1000
