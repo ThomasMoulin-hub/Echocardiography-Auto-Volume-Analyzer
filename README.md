@@ -112,11 +112,13 @@ I have explored several techniques to tackle this issue, though none have yielde
    <img src="assets/videos/method1_tracking_overlay_dendo.gif" width="800">
    <br>
    <img src="assets/videos/method1_tracking_overlay_lendo.gif" width="800">
+   <br>
 
 2. **Approach 2: Optical Flow (Lucas-Kanade)**
    An attempt was made using the Lucas-Kanade optical flow method. The idea was to identify "good features to track" (using `cv2.goodFeaturesToTrack`) along the contour of the manually drawn ellipse on the first frame, and then calculate their displacement frame by frame using `cv2.calcOpticalFlowPyrLK`. While optical flow is standard for motion tracking, it fails rapidly on echocardiograms because the tissue appears and disappears (speckle noise decorrelation), meaning the tracked points quickly drift away from the actual anatomical border.
    <br>
    <img src="assets/videos/method2_tracking_overlay_dendo.gif" width="800">
+   <br>
 
 3. **Approach 3: Deep Learning (EchoNet-Dynamic)**
    I also looked into state-of-the-art AI solutions, specifically the **[EchoNet-Dynamic](https://github.com/echonet/dynamic)** model developed by Stanford. It uses a deep learning segmentation architecture specifically trained on thousands of apical 4-chamber echocardiography videos to automatically segment the left ventricle. Surprisingly it's the least conclusive approach. But I have to say the lendo videos are very low quality.
