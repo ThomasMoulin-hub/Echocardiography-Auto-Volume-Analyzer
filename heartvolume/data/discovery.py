@@ -9,7 +9,7 @@ IMAGE_EXT = (".png", ".jpg", ".jpeg", ".bmp", ".PNG", ".JPG", ".JPEG", ".BMP")
 
 def data_dir() -> str:
     base = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    return os.path.join(base, "data")
+    return os.path.join(base, "data/2nd Session")
 
 
 def _find_file(keywords: list[str], extensions: tuple[str, ...]) -> Optional[str]:

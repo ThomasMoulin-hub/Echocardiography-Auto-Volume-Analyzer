@@ -8,7 +8,7 @@ import numpy as np
 from heartvolume.core.models import Measurement
 
 
-def measure_distance(frame: np.ndarray, label: str, window_name: str = "Mesure") -> Optional[Measurement]:
+def measure_distance(frame: np.ndarray, label: str, window_name: str = "Measure") -> Optional[Measurement]:
     """Measure a segment by clicking 2 points on the frame."""
     original = frame.copy()
     measurement = Measurement()
@@ -18,13 +18,13 @@ def measure_distance(frame: np.ndarray, label: str, window_name: str = "Mesure")
 
     def redraw() -> None:
         canvas = original.copy()
-        cv2.putText(canvas, f"Mesure: {label}", (12, 28), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (20, 255, 20), 2)
+        cv2.putText(canvas, f"Measure: {label}", (12, 28), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (20, 255, 20), 2)
         if measurement.point1 is None:
-            help_text = "Cliquez le point 1"
+            help_text = "Click point 1"
         elif measurement.point2 is None:
-            help_text = "Cliquez le point 2"
+            help_text = "Click point 2"
         else:
-            help_text = "Entree: valider | R: refaire | ESC: annuler"
+            help_text = "Enter: validate | R: redo | ESC: cancel"
         cv2.putText(canvas, help_text, (12, 56), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
 
         if measurement.point1 is not None:
@@ -62,4 +62,3 @@ def measure_distance(frame: np.ndarray, label: str, window_name: str = "Mesure")
         if key in (ord("r"), ord("R")):
             measurement = Measurement()
             redraw()
-

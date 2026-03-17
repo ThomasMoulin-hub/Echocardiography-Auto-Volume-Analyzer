@@ -49,11 +49,11 @@ class FreehandEllipseTool:
 def read_first_frame(video_path: str) -> np.ndarray:
     cap = cv2.VideoCapture(video_path)
     if not cap.isOpened():
-        raise ValueError(f"Impossible d'ouvrir la video: {video_path}")
+        raise ValueError(f"Unable to open video: {video_path}")
     ok, frame = cap.read()
     cap.release()
     if not ok or frame is None:
-        raise ValueError("Impossible de lire la premiere frame")
+        raise ValueError("Unable to read the first frame")
     return frame
 
 
@@ -164,17 +164,17 @@ def draw_overlay(
         cv2.polylines(out, [poly], False, (0, 255, 255), 2, cv2.LINE_AA)
 
     cv2.ellipse(out, freehand_ellipse, (0, 255, 0), 2, cv2.LINE_AA)
-    cv2.putText(out, "Ellipse ajustee sur trace", (20, 35), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2, cv2.LINE_AA)
+    cv2.putText(out, "Fitted ellipse on trace", (20, 35), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2, cv2.LINE_AA)
 
     if refined_ellipse is not None:
         cv2.ellipse(out, refined_ellipse, (255, 120, 0), 2, cv2.LINE_AA)
-        cv2.putText(out, "Ellipse recherchee", (20, 72), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 120, 0), 2, cv2.LINE_AA)
+        cv2.putText(out, "Searched ellipse", (20, 72), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 120, 0), 2, cv2.LINE_AA)
     else:
-        cv2.putText(out, "Ellipse recherchee non trouvee", (20, 72), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 180, 255), 2, cv2.LINE_AA)
+        cv2.putText(out, "Searched ellipse not found", (20, 72), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 180, 255), 2, cv2.LINE_AA)
 
     cv2.putText(
         out,
-        f"Seuil transition: +{transition_increase_pct}% (arret quand variation relative interieur->exterieur depasse ce seuil)",
+        f"Transition threshold: +{transition_increase_pct}% (stops when inside->outside variation exceeds limit)",
         (20, 108),
         cv2.FONT_HERSHEY_SIMPLEX,
         0.66,
@@ -182,8 +182,8 @@ def draw_overlay(
         2,
         cv2.LINE_AA,
     )
-    cv2.putText(out, "Jaune: trace libre", (20, out.shape[0] - 54), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 255), 2, cv2.LINE_AA)
-    cv2.putText(out, "R: relancer recherche | +/- ou T/G: changer seuil", (20, out.shape[0] - 22), cv2.FONT_HERSHEY_SIMPLEX, 0.72, (180, 255, 180), 2, cv2.LINE_AA)
+    cv2.putText(out, "Yellow: freehand trace", (20, out.shape[0] - 54), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 255), 2, cv2.LINE_AA)
+    cv2.putText(out, "R: restart search | +/- or T/G: change threshold", (20, out.shape[0] - 22), cv2.FONT_HERSHEY_SIMPLEX, 0.72, (180, 255, 180), 2, cv2.LINE_AA)
     return out
 
 
@@ -223,15 +223,15 @@ def run(video_path: str, output_dir: Path) -> None:
     frame = read_first_frame(video_path)
     tool = FreehandEllipseTool(frame)
 
-    win = "AP - Trace libre ellipse (Frame 1)"
+    win = "AP - Freehand ellipse trace (Frame 1)"
     cv2.namedWindow(win, cv2.WINDOW_NORMAL)
     cv2.resizeWindow(win, 1400, 900)
     cv2.setMouseCallback(win, tool.on_mouse)
 
     while True:
         canvas = tool.display.copy()
-        cv2.putText(canvas, "Trace une ellipse a main levee (souris)", (20, 35), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 220, 255), 2, cv2.LINE_AA)
-        cv2.putText(canvas, "Entree: valider | R: reset | ESC: quitter", (20, 72), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2, cv2.LINE_AA)
+        cv2.putText(canvas, "Draw a freehand ellipse (mouse)", (20, 35), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 220, 255), 2, cv2.LINE_AA)
+        cv2.putText(canvas, "Enter: validate | R: reset | ESC: quit", (20, 72), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2, cv2.LINE_AA)
         cv2.imshow(win, canvas)
 
         key = cv2.waitKeyEx(20)
@@ -243,7 +243,7 @@ def run(video_path: str, output_dir: Path) -> None:
             continue
         if key in (13, 10):
             if len(tool.points) < 5:
-                print("Pas assez de points: trace plus longuement le contour.")
+                print("Not enough points: draw the contour a bit more.")
                 continue
             break
 
@@ -251,19 +251,19 @@ def run(video_path: str, output_dir: Path) -> None:
 
     freehand_ellipse = fit_ellipse_from_points(tool.points)
     if freehand_ellipse is None:
-        raise RuntimeError("Impossible d'ajuster une ellipse depuis la trace libre")
+        raise RuntimeError("Unable to fit an ellipse from the freehand trace")
 
     threshold = DEFAULT_TRANSITION_INCREASE_PCT
     refined = refine_ellipse_with_image(frame, tool.points, transition_increase_pct=threshold)
     overlay = draw_overlay(frame, tool.points, freehand_ellipse, refined, threshold)
 
-    preview = "AP - Resultat ellipse"
+    preview = "AP - Ellipse result"
     cv2.namedWindow(preview, cv2.WINDOW_NORMAL)
     cv2.resizeWindow(preview, 1400, 900)
 
     while True:
         canvas = overlay.copy()
-        cv2.putText(canvas, "S: sauvegarder | R: relancer | +/- ou T/G: seuil | ESC: fermer", (20, 146), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (220, 220, 220), 2, cv2.LINE_AA)
+        cv2.putText(canvas, "S: save | R: restart | +/- or T/G: threshold | ESC: close", (20, 146), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (220, 220, 220), 2, cv2.LINE_AA)
         cv2.imshow(preview, canvas)
         key = cv2.waitKeyEx(20)
         if key == 27:
@@ -286,15 +286,15 @@ def run(video_path: str, output_dir: Path) -> None:
         if key in (ord("s"), ord("S"), 13, 10):
             save_results(frame, overlay, freehand_ellipse, refined, output_dir, threshold)
             cv2.destroyAllWindows()
-            print(f"Resultats sauvegardes dans: {output_dir}")
+            print(f"Results saved to: {output_dir}")
             return
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Trace libre puis fitting d'ellipse sur la video AP (frame 1).")
-    parser.add_argument("--video", default=DEFAULT_VIDEO, help="Chemin de la video AP")
-    parser.add_argument("--output", default=str(OUTPUT_DIR), help="Dossier de sortie")
-    parser.add_argument("--increase-pct", type=int, default=15, help=f"Pourcentage d'augmentation interieur->exterieur initial (1-{MAX_TRANSITION_INCREASE_PCT})")
+    parser = argparse.ArgumentParser(description="Freehand trace then ellipse fitting on the AP video (frame 1).")
+    parser.add_argument("--video", default=DEFAULT_VIDEO, help="Path to the AP video")
+    parser.add_argument("--output", default=str(OUTPUT_DIR), help="Output directory")
+    parser.add_argument("--increase-pct", type=int, default=15, help=f"Initial inside->outside increase percentage (1-{MAX_TRANSITION_INCREASE_PCT})")
     return parser.parse_args()
 
 

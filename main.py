@@ -1,7 +1,5 @@
-"""HeartVolume GUI entrypoint.
-
-This file keeps a small compatibility layer for existing imports
-(e.g. test_scale.py importing detect_scale_on_frame).
+"""
+HeartVolume GUI entrypoint.
 """
 
 

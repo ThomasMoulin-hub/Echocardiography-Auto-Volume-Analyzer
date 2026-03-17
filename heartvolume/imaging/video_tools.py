@@ -31,11 +31,11 @@ class MultiFrameSelection:
 def load_video(video_path: str) -> cv2.VideoCapture:
     cap = cv2.VideoCapture(video_path)
     if not cap.isOpened():
-        raise ValueError(f"Impossible d'ouvrir la video: {video_path}")
+        raise ValueError(f"Unable to open video: {video_path}")
     return cap
 
 
-def select_frame(video_path: str, window_name: str = "Selection frame") -> FrameSelection:
+def select_frame(video_path: str, window_name: str = "Frame Selection") -> FrameSelection:
     cap = load_video(video_path)
     total_frames = max(1, int(cap.get(cv2.CAP_PROP_FRAME_COUNT)))
     fps = cap.get(cv2.CAP_PROP_FPS) or 1.0
@@ -53,7 +53,7 @@ def select_frame(video_path: str, window_name: str = "Selection frame") -> Frame
 
         canvas = frame.copy()
         cv2.putText(canvas, f"Frame {idx + 1}/{total_frames} ({idx / fps:.2f}s)", (12, 28), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (20, 255, 20), 2)
-        cv2.putText(canvas, "Fleches/A-D/W-S : naviguer | H/E : debut/fin | Entree/Espace : valider | ESC : annuler", (12, 56), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+        cv2.putText(canvas, "Arrows/A-D/W-S : navigate | H/E : start/end | Enter/Space : validate | ESC : cancel", (12, 56), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
         cv2.imshow(window_name, canvas)
 
         key = cv2.waitKeyEx(0)
@@ -143,7 +143,7 @@ def _draw_text_with_bg(img: np.ndarray, text: str, org: tuple[int, int], scale: 
 
 def select_frames_grid(video_paths: list[str], titles: list[str], step_name: str) -> MultiFrameSelection:
     if len(video_paths) != 4 or len(titles) != 4:
-        raise ValueError("select_frames_grid attend exactement 4 videos et 4 titres")
+        raise ValueError("select_frames_grid expects exactly 4 videos and 4 titles")
 
     caps = [load_video(path) for path in video_paths]
     totals = [max(1, int(c.get(cv2.CAP_PROP_FRAME_COUNT))) for c in caps]
@@ -213,10 +213,10 @@ def select_frames_grid(video_paths: list[str], titles: list[str], step_name: str
 
         header = np.zeros((56, core.shape[1], 3), dtype=np.uint8)
         footer = np.zeros((64, core.shape[1], 3), dtype=np.uint8)
-        _draw_text_with_bg(header, f"{step_name} - selection des frames", (16, 40), scale=0.95, color=(0, 255, 255))
+        _draw_text_with_bg(header, f"{step_name} - frame selection", (16, 40), scale=0.95, color=(0, 255, 255))
         _draw_text_with_bg(
             footer,
-            "Clique sur une video pour la rendre active | Fleches/A-D: +/-1 | W/S: +/-10 | H/E: debut/fin | +/-: zoom | Entree: valider",
+            "Click on a video to make it active | Arrows/A-D: +/-1 | W/S: +/-10 | H/E: start/end | +/-: zoom | Enter: validate",
             (16, 44),
             scale=0.68,
             color=(0, 255, 0),
@@ -286,9 +286,9 @@ def measure_lengths_grid(
     scales_cm_per_px: list[float] | None = None,
 ) -> list[float] | None:
     if len(frames) != 4 or len(titles) != 4 or len(labels) != 4:
-        raise ValueError("measure_lengths_grid attend exactement 4 frames, 4 titres et 4 labels")
+        raise ValueError("measure_lengths_grid expects exactly 4 frames, 4 titles and 4 labels")
 
-    win = f"Mesures 2x2 - {step_name}"
+    win = f"Measurements 2x2 - {step_name}"
     cv2.namedWindow(win, cv2.WINDOW_NORMAL)
     cv2.resizeWindow(win, 1900, 1080)
 
@@ -395,9 +395,9 @@ def measure_lengths_grid(
         header = np.zeros((header_h, core.shape[1], 3), dtype=np.uint8)
         footer = np.zeros((footer_h, core.shape[1], 3), dtype=np.uint8)
 
-        _draw_text_with_bg(header, f"{step_name} - mesures simultanees (2 clics par video)", (14, 44), scale=1.0, color=(0, 255, 255), thickness=2)
-        line1 = "Clique directement dans chaque video pour poser 2 points"
-        line2 = "1-4: actif | R: reset actif | C: reset tout | +/-: zoom | Entree: valider | ESC: annuler"
+        _draw_text_with_bg(header, f"{step_name} - simultaneous measurements (2 clicks per video)", (14, 44), scale=1.0, color=(0, 255, 255), thickness=2)
+        line1 = "Click directly in each video to place 2 points"
+        line2 = "1-4: active | R: reset active | C: reset all | +/-: zoom | Enter: validate | ESC: cancel"
         _draw_text_with_bg(footer, line1, (12, 34), scale=0.8, color=(0, 255, 0), thickness=2)
         _draw_text_with_bg(footer, line2, (12, 68), scale=0.76, color=(0, 255, 0), thickness=2)
         if warning:
@@ -412,7 +412,7 @@ def measure_lengths_grid(
         if key in (13, 32):
             if all(len(p) == 2 for p in points):
                 break
-            warning = "Mesure incomplete: il faut 2 points sur chaque video."
+            warning = "Incomplete measure: 2 points needed on each video."
             continue
         if key in (ord("1"), ord("2"), ord("3"), ord("4")):
             active = int(chr(key)) - 1

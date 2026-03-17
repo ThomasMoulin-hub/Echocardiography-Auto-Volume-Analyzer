@@ -37,8 +37,8 @@ class HeartVolumeApp:
     def _build_header(self) -> None:
         top = ttk.Frame(self.root, padding=10)
         top.pack(fill="x")
-        ttk.Label(top, text="Analyse echocardiographique (Simple / Simpson / Doppler)", font=("Segoe UI", 13, "bold")).pack(side="left")
-        ttk.Button(top, text="Auto-detecter data/", command=self._autofill_paths).pack(side="right")
+        ttk.Label(top, text="Echocardiographic Analysis (Simple / Simpson / Doppler)", font=("Segoe UI", 13, "bold")).pack(side="left")
+        ttk.Button(top, text="Auto-detect data/", command=self._autofill_paths).pack(side="right")
 
     def _build_tabs(self) -> None:
         self.notebook = ttk.Notebook(self.root)
@@ -48,8 +48,8 @@ class HeartVolumeApp:
         self.simpson_tab = ttk.Frame(self.notebook, padding=10)
         self.doppler_tab = ttk.Frame(self.notebook, padding=10)
 
-        self.notebook.add(self.simple_tab, text="Methode simple")
-        self.notebook.add(self.simpson_tab, text="Simpson modifiee")
+        self.notebook.add(self.simple_tab, text="Simple Method")
+        self.notebook.add(self.simpson_tab, text="Modified Simpson")
         self.notebook.add(self.doppler_tab, text="Doppler")
 
         self._build_simple_tab()
@@ -57,16 +57,16 @@ class HeartVolumeApp:
         self._build_doppler_tab()
 
     def _build_output(self) -> None:
-        block = ttk.LabelFrame(self.root, text="Resultats", padding=8)
+        block = ttk.LabelFrame(self.root, text="Results", padding=8)
         block.pack(fill="both", expand=False, padx=10, pady=(0, 10))
         self.output = tk.Text(block, height=14, wrap="word")
         self.output.pack(fill="both", expand=True)
-        self._log("Pret. Choisis une methode puis clique sur 'Lancer'.")
+        self._log("Ready. Select a method and click 'Run'.")
 
     def _row_file_selector(self, parent: ttk.Frame, row: int, label: str, var: tk.StringVar, filetypes: list[tuple[str, str]]) -> None:
         ttk.Label(parent, text=label, width=18).grid(row=row, column=0, sticky="w", pady=4)
         ttk.Entry(parent, textvariable=var, width=75).grid(row=row, column=1, sticky="ew", pady=4, padx=4)
-        ttk.Button(parent, text="Parcourir", command=lambda: self._browse_into(var, filetypes)).grid(row=row, column=2, padx=4, pady=4)
+        ttk.Button(parent, text="Browse", command=lambda: self._browse_into(var, filetypes)).grid(row=row, column=2, padx=4, pady=4)
 
     def _build_simple_tab(self) -> None:
         self.simple_video_var = tk.StringVar()
@@ -76,13 +76,13 @@ class HeartVolumeApp:
         self._row_file_selector(
             self.simple_tab,
             0,
-            "Video apicale:",
+            "Apical Video:",
             self.simple_video_var,
-            [("Videos", "*.mp4;*.avi;*.mov;*.mkv"), ("Tous", "*.*")],
+            [("Videos", "*.mp4;*.avi;*.mov;*.mkv"), ("All Files", "*.*")],
         )
-        ttk.Label(self.simple_tab, text="HR (bpm, optionnel):", width=18).grid(row=1, column=0, sticky="w", pady=4)
+        ttk.Label(self.simple_tab, text="HR (bpm, optional):", width=18).grid(row=1, column=0, sticky="w", pady=4)
         ttk.Entry(self.simple_tab, textvariable=self.simple_hr_var, width=20).grid(row=1, column=1, sticky="w", pady=4)
-        ttk.Button(self.simple_tab, text="Lancer methode simple", command=self.run_simple).grid(row=2, column=0, columnspan=3, sticky="ew", pady=10)
+        ttk.Button(self.simple_tab, text="Run Simple Method", command=self.run_simple).grid(row=2, column=0, columnspan=3, sticky="ew", pady=10)
 
     def _build_simpson_tab(self) -> None:
         self.simpson_apical_var = tk.StringVar()
@@ -93,16 +93,16 @@ class HeartVolumeApp:
         self.simpson_tick_cm_var = tk.StringVar(value="1.0")
 
         self.simpson_tab.columnconfigure(1, weight=1)
-        self._row_file_selector(self.simpson_tab, 0, "Video apicale:", self.simpson_apical_var, [("Videos", "*.mp4;*.avi;*.mov;*.mkv"), ("Tous", "*.*")])
-        self._row_file_selector(self.simpson_tab, 1, "Video MV:", self.simpson_mv_var, [("Videos", "*.mp4;*.avi;*.mov;*.mkv"), ("Tous", "*.*")])
-        self._row_file_selector(self.simpson_tab, 2, "Video PM:", self.simpson_pm_var, [("Videos", "*.mp4;*.avi;*.mov;*.mkv"), ("Tous", "*.*")])
-        self._row_file_selector(self.simpson_tab, 3, "Video Apex:", self.simpson_apex_var, [("Videos", "*.mp4;*.avi;*.mov;*.mkv"), ("Tous", "*.*")])
+        self._row_file_selector(self.simpson_tab, 0, "Apical Video:", self.simpson_apical_var, [("Videos", "*.mp4;*.avi;*.mov;*.mkv"), ("All Files", "*.*")])
+        self._row_file_selector(self.simpson_tab, 1, "MV Video:", self.simpson_mv_var, [("Videos", "*.mp4;*.avi;*.mov;*.mkv"), ("All Files", "*.*")])
+        self._row_file_selector(self.simpson_tab, 2, "PM Video:", self.simpson_pm_var, [("Videos", "*.mp4;*.avi;*.mov;*.mkv"), ("All Files", "*.*")])
+        self._row_file_selector(self.simpson_tab, 3, "Apex Video:", self.simpson_apex_var, [("Videos", "*.mp4;*.avi;*.mov;*.mkv"), ("All Files", "*.*")])
 
-        ttk.Label(self.simpson_tab, text="HR (bpm, optionnel):").grid(row=4, column=0, sticky="w", pady=4)
+        ttk.Label(self.simpson_tab, text="HR (bpm, optional):").grid(row=4, column=0, sticky="w", pady=4)
         ttk.Entry(self.simpson_tab, textvariable=self.simpson_hr_var, width=20).grid(row=4, column=1, sticky="w", pady=4)
-        ttk.Label(self.simpson_tab, text="Graduation echelle (cm):").grid(row=5, column=0, sticky="w", pady=4)
+        ttk.Label(self.simpson_tab, text="Scale tick dist (cm):").grid(row=5, column=0, sticky="w", pady=4)
         ttk.Entry(self.simpson_tab, textvariable=self.simpson_tick_cm_var, width=20).grid(row=5, column=1, sticky="w", pady=4)
-        ttk.Button(self.simpson_tab, text="Lancer Simpson modifiee", command=self.run_simpson).grid(row=6, column=0, columnspan=3, sticky="ew", pady=10)
+        ttk.Button(self.simpson_tab, text="Run Modified Simpson", command=self.run_simpson).grid(row=6, column=0, columnspan=3, sticky="ew", pady=10)
 
     def _build_doppler_tab(self) -> None:
         self.doppler_image_var = tk.StringVar()
@@ -111,14 +111,14 @@ class HeartVolumeApp:
         self.doppler_hr_var = tk.StringVar(value="60")
 
         self.doppler_tab.columnconfigure(1, weight=1)
-        self._row_file_selector(self.doppler_tab, 0, "Image D_AO:", self.doppler_image_var, [("Images", "*.png;*.jpg;*.jpeg;*.bmp"), ("Tous", "*.*")])
-        self._row_file_selector(self.doppler_tab, 1, "Video D_AO:", self.doppler_video_var, [("Videos", "*.mp4;*.avi;*.mov;*.mkv"), ("Tous", "*.*")])
+        self._row_file_selector(self.doppler_tab, 0, "D_AO Image:", self.doppler_image_var, [("Images", "*.png;*.jpg;*.jpeg;*.bmp"), ("All Files", "*.*")])
+        self._row_file_selector(self.doppler_tab, 1, "D_AO Video:", self.doppler_video_var, [("Videos", "*.mp4;*.avi;*.mov;*.mkv"), ("All Files", "*.*")])
 
         ttk.Label(self.doppler_tab, text="VTI (cm):", width=18).grid(row=2, column=0, sticky="w", pady=4)
         ttk.Entry(self.doppler_tab, textvariable=self.doppler_vti_var, width=20).grid(row=2, column=1, sticky="w", pady=4)
         ttk.Label(self.doppler_tab, text="HR (bpm):", width=18).grid(row=3, column=0, sticky="w", pady=4)
         ttk.Entry(self.doppler_tab, textvariable=self.doppler_hr_var, width=20).grid(row=3, column=1, sticky="w", pady=4)
-        ttk.Button(self.doppler_tab, text="Lancer Doppler", command=self.run_doppler).grid(row=4, column=0, columnspan=3, sticky="ew", pady=10)
+        ttk.Button(self.doppler_tab, text="Run Doppler", command=self.run_doppler).grid(row=4, column=0, columnspan=3, sticky="ew", pady=10)
 
     def _browse_into(self, var: tk.StringVar, filetypes: list[tuple[str, str]]) -> None:
         path = filedialog.askopenfilename(filetypes=filetypes)
@@ -143,7 +143,7 @@ class HeartVolumeApp:
         if videos.get("d_ao"):
             self.doppler_video_var.set(videos["d_ao"])
 
-        self._log("Auto-detection terminee.")
+        self._log("Auto-detection finished.")
 
     def _log(self, text: str) -> None:
         self.output.insert("end", text + "\n")
@@ -161,24 +161,24 @@ class HeartVolumeApp:
         if detected is not None:
             px_per_cm = 1.0 / detected if detected > 0 else 0
             use_auto = messagebox.askyesno(
-                "Echelle detectee",
-                f"Echelle detectee automatiquement: {detected:.6f} cm/pixel\n({px_per_cm:.1f} pixels pour 1 cm)\n\nUtiliser cette valeur ?",
+                "Scale Detected",
+                f"Automatically detected scale: {detected:.6f} cm/pixel\n({px_per_cm:.1f} pixels per cm)\n\nUse this value?",
             )
             if use_auto:
                 return detected
 
-            tick_cm = simpledialog.askfloat("Graduation", "Distance reelle entre deux graduations (cm):", initialvalue=1.0, minvalue=0.01)
+            tick_cm = simpledialog.askfloat("Tick Distance", "Real distance between two ticks (cm):", initialvalue=1.0, minvalue=0.01)
             if tick_cm is not None:
                 corrected = detect_scale_on_frame(frame, cm_per_tick=tick_cm)
                 if corrected is not None:
                     return corrected
-                messagebox.showwarning("Echelle", "Detection automatique echouee avec cette graduation. Calibration manuelle.")
+                messagebox.showwarning("Scale", "Automatic detection failed with this tick distance. Manual calibration.")
 
-        messagebox.showinfo("Calibration manuelle", "Clique 2 points de distance connue, puis entre la distance en cm.")
+        messagebox.showinfo("Manual Calibration", "Click 2 points of known distance, then enter the distance in cm.")
         m = measure_distance(frame, "Calibration")
         if m is None or not m.is_complete():
             return None
-        real_cm = simpledialog.askfloat("Distance reelle", "Distance entre les 2 points (cm):", minvalue=0.01)
+        real_cm = simpledialog.askfloat("Real Distance", "Distance between the 2 points (cm):", minvalue=0.01)
         if real_cm is None:
             return None
         if m.distance_pixels() <= 0:
@@ -187,10 +187,10 @@ class HeartVolumeApp:
 
     def _measure_cm_on_video(self, video_path: str, label: str, scale_cm_per_pixel: float | None = None) -> tuple[float | None, float | None]:
         if not os.path.isfile(video_path):
-            messagebox.showerror("Fichier", f"Video introuvable:\n{video_path}")
+            messagebox.showerror("File", f"Video not found:\n{video_path}")
             return None, scale_cm_per_pixel
 
-        selected = select_frame(video_path, window_name=f"Selection frame - {label}")
+        selected = select_frame(video_path, window_name=f"Frame Selection - {label}")
         if selected.frame is None:
             return None, scale_cm_per_pixel
 
@@ -200,7 +200,7 @@ class HeartVolumeApp:
             if scale is None:
                 return None, scale_cm_per_pixel
 
-        m = measure_distance(selected.frame, label=label, window_name=f"Mesure - {label}")
+        m = measure_distance(selected.frame, label=label, window_name=f"Measure - {label}")
         if m is None or not m.is_complete():
             return None, scale
 
@@ -210,14 +210,14 @@ class HeartVolumeApp:
         try:
             return float(value.strip())
         except Exception as exc:
-            raise ValueError(f"Valeur invalide pour {field_name}") from exc
+            raise ValueError(f"Invalid value for {field_name}") from exc
 
     def run_simple(self) -> None:
-        self._log("--- Methode simple ---")
+        self._log("--- Simple Method ---")
         try:
             path = self.simple_video_var.get().strip()
             if not path:
-                raise ValueError("Selectionne la video apicale")
+                raise ValueError("Select the apical video")
 
             l_ed, scale = self._measure_cm_on_video(path, "Lendo_ED", None)
             if l_ed is None:
@@ -243,7 +243,7 @@ class HeartVolumeApp:
             if result.co is not None:
                 self._log(f"CO={result.co:.2f} L/min")
         except Exception as exc:
-            messagebox.showerror("Erreur", str(exc))
+            messagebox.showerror("Error", str(exc))
 
     @staticmethod
     def _default_scale_roi(frame: np.ndarray) -> tuple[int, int, int, int]:
@@ -266,7 +266,7 @@ class HeartVolumeApp:
         dx = max(2, int(frame.shape[1] * 0.01))
         dy = max(2, int(frame.shape[0] * 0.01))
 
-        # Deplacement
+        # Movement
         if key in (ord("j"), ord("J")):
             x0 -= dx
             x1 -= dx
@@ -279,7 +279,7 @@ class HeartVolumeApp:
         elif key in (ord("k"), ord("K")):
             y0 += dy
             y1 += dy
-        # Redimensionnement
+        # Resizing
         elif key in (ord("u"), ord("U")):
             x1 = max(x0 + 20, x1 - dx)
         elif key in (ord("o"), ord("O")):
@@ -296,7 +296,7 @@ class HeartVolumeApp:
         for i, path in enumerate(video_paths):
             frame = read_frame(path, 0)
             if frame is None:
-                raise ValueError(f"Impossible de lire la frame 1 de {titles[i]}")
+                raise ValueError(f"Unable to read frame 1 of {titles[i]}")
             frames.append(frame)
 
         rois = [self._default_scale_roi(frame) for frame in frames]
@@ -325,7 +325,7 @@ class HeartVolumeApp:
 
         tile_w = 900
         tile_h = 500
-        win = f"Auto echelle 2x2 - {step_name}"
+        win = f"Auto scale 2x2 - {step_name}"
         cv2.namedWindow(win, cv2.WINDOW_NORMAL)
         cv2.resizeWindow(win, 1900, 1080)
 
@@ -402,10 +402,10 @@ class HeartVolumeApp:
                     px_per_cm = 1.0 / details.cm_per_pixel
                     draw_text_with_bg(tile, f"{details.cm_per_pixel:.6f} cm/px  ({px_per_cm:.1f} px/cm)", (12, 84), scale=0.9, color=(150, 255, 150), thickness=2)
                 else:
-                    draw_text_with_bg(tile, "Echelle auto: non detectee", (12, 84), scale=0.9, color=(120, 120, 255), thickness=2)
+                    draw_text_with_bg(tile, "Auto scale: not detected", (12, 84), scale=0.9, color=(120, 120, 255), thickness=2)
 
                 visible = details.visible_cm if details.visible_cm is not None else 0.0
-                draw_text_with_bg(tile, f"Longueur estimee de la regle visible: {visible:.2f} cm", (12, 122), scale=0.88, color=color, thickness=2)
+                draw_text_with_bg(tile, f"Estimated visible ruler length: {visible:.2f} cm", (12, 122), scale=0.88, color=color, thickness=2)
 
             top = np.hstack([tiles[0], tiles[1]])
             bottom = np.hstack([tiles[2], tiles[3]])
@@ -415,10 +415,10 @@ class HeartVolumeApp:
 
             header = np.zeros((header_h, core.shape[1], 3), dtype=np.uint8)
             footer = np.zeros((footer_h, core.shape[1], 3), dtype=np.uint8)
-            draw_text_with_bg(header, f"{step_name} - auto echelle sur frame 1 (ROI modifiable)", (14, 44), scale=1.0, color=(0, 255, 255), thickness=2)
+            draw_text_with_bg(header, f"{step_name} - auto scale on frame 1 (ROI modifiable)", (14, 44), scale=1.0, color=(0, 255, 255), thickness=2)
             draw_text_with_bg(
                 footer,
-                f"cm entre graduations={cm_per_tick:.3f} | Clique video active | Double-clic plein ecran/retour | IJKL deplacer | U/O largeur -/+ | Y/H hauteur -/+ | R reset | +/- zoom | Entree",
+                f"cm between ticks={cm_per_tick:.3f} | Click active video | Double-click fullscreen/return | IJKL move | U/O width -/+ | Y/H height -/+ | R reset | +/- zoom | Enter",
                 (12, 50),
                 scale=0.74,
                 color=(0, 255, 0),
@@ -437,7 +437,7 @@ class HeartVolumeApp:
                 if all(d.cm_per_pixel is not None and d.cm_per_pixel > 0 for d in details_list):
                     final_details = details_list
                     break
-                warning = "Auto KO sur au moins une video: ajuste les ROI puis revalide."
+                warning = "Auto KO on at least one video: adjust ROIs then revalidate."
                 continue
             if key == 27:
                 cv2.destroyWindow(win)
@@ -476,12 +476,12 @@ class HeartVolumeApp:
         return out_scales
 
     def _measure_simpson_step(self, step_name: str, video_paths: list[str], titles: list[str], labels: list[str], scales: list[float]) -> dict[str, float] | None:
-        selected = select_frames_grid(video_paths, titles, step_name=f"{step_name} - selection frame")
+        selected = select_frames_grid(video_paths, titles, step_name=f"{step_name} - frame selection")
         if any(frame is None for frame in selected.frames):
             return None
 
         frames = [frame for frame in selected.frames if frame is not None]
-        distances_px = measure_lengths_grid(frames, titles, labels, step_name=f"{step_name} - mesures", scales_cm_per_px=scales)
+        distances_px = measure_lengths_grid(frames, titles, labels, step_name=f"{step_name} - measures", scales_cm_per_px=scales)
         if distances_px is None:
             return None
 
@@ -496,24 +496,24 @@ class HeartVolumeApp:
         return values
 
     def run_simpson(self) -> None:
-        self._log("--- Simpson modifiee (grille 2x2 EDV/ESV) ---")
+        self._log("--- Modified Simpson (2x2 grid EDV/ESV) ---")
         try:
             apical = self.simpson_apical_var.get().strip()
             mv = self.simpson_mv_var.get().strip()
             pm = self.simpson_pm_var.get().strip()
             apex = self.simpson_apex_var.get().strip()
             if not all([apical, mv, pm, apex]):
-                raise ValueError("Selectionne les 4 videos: apicale, MV, PM, Apex")
+                raise ValueError("Select the 4 videos: Apical, MV, PM, Apex")
 
             video_paths = [apical, mv, pm, apex]
             titles = ["Apical", "MV", "PM", "Apex"]
             for path in video_paths:
                 if not os.path.isfile(path):
-                    raise ValueError(f"Video introuvable: {path}")
+                    raise ValueError(f"Video not found: {path}")
 
-            tick_cm = self._require_float(self.simpson_tick_cm_var.get(), "Graduation echelle (cm)")
+            tick_cm = self._require_float(self.simpson_tick_cm_var.get(), "Scale tick dist (cm)")
             if tick_cm <= 0:
-                raise ValueError("La graduation d'echelle doit etre > 0")
+                raise ValueError("Scale tick distance must be > 0")
 
             scales_edv = self._preview_scales_grid(video_paths, titles, step_name="EDV", cm_per_tick=tick_cm)
             if scales_edv is None:
@@ -541,18 +541,18 @@ class HeartVolumeApp:
             result = build_volume_result(edv, esv, hr)
 
             self._log(
-                "EDV mesures (cm): "
+                "EDV measures (cm): "
                 + f"L={values_edv['L_ED']:.2f} | MV={values_edv['D_MV_ED']:.2f} | PM={values_edv['D_PM_ED']:.2f} | Apex={values_edv['D_APEX_ED']:.2f}"
             )
             self._log(
-                "ESV mesures (cm): "
+                "ESV measures (cm): "
                 + f"L={values_esv['L_ES']:.2f} | MV={values_esv['D_MV_ES']:.2f} | PM={values_esv['D_PM_ES']:.2f} | Apex={values_esv['D_APEX_ES']:.2f}"
             )
             self._log(f"EDV={result.edv:.2f} ml | ESV={result.esv:.2f} ml | SV={result.sv:.2f} ml | EF={result.ef:.1f}%")
             if result.co is not None:
                 self._log(f"CO={result.co:.2f} L/min")
         except Exception as exc:
-            messagebox.showerror("Erreur", str(exc))
+            messagebox.showerror("Error", str(exc))
 
     def run_doppler(self) -> None:
         self._log("--- Doppler ---")
@@ -564,20 +564,20 @@ class HeartVolumeApp:
             if img_path and os.path.isfile(img_path):
                 frame = cv2.imread(img_path)
                 if frame is None:
-                    raise ValueError("Impossible de lire l'image D_AO")
+                    raise ValueError("Unable to read the D_AO image")
             elif video_path and os.path.isfile(video_path):
-                selected = select_frame(video_path, window_name="Selection frame - D_AO")
+                selected = select_frame(video_path, window_name="Frame Selection - D_AO")
                 if selected.frame is None:
                     return
                 frame = selected.frame
             else:
-                raise ValueError("Selectionne une image D_AO ou une video D_AO")
+                raise ValueError("Select a D_AO image or a D_AO video")
 
             scale = self._calibrate_scale(frame)
             if scale is None:
                 return
 
-            m = measure_distance(frame, "D_AO", window_name="Mesure - D_AO")
+            m = measure_distance(frame, "D_AO", window_name="Measure - D_AO")
             if m is None or not m.is_complete():
                 return
             d_ao = m.distance_pixels() * scale
@@ -587,13 +587,12 @@ class HeartVolumeApp:
 
             result = build_doppler_result(d_ao, vti, hr)
             self._log(f"D_AO={result.d_ao:.2f} cm | VTI={result.vti:.2f} cm | HR={result.hr:.0f} bpm")
-            self._log(f"Surface aortique={result.area_ao:.2f} cm^2 | SV={result.sv:.2f} ml | CO={result.co:.2f} L/min")
+            self._log(f"Aortic area={result.area_ao:.2f} cm^2 | SV={result.sv:.2f} ml | CO={result.co:.2f} L/min")
         except Exception as exc:
-            messagebox.showerror("Erreur", str(exc))
+            messagebox.showerror("Error", str(exc))
 
 
 def run_gui() -> None:
     root = tk.Tk()
     app = HeartVolumeApp(root)
     root.mainloop()
-

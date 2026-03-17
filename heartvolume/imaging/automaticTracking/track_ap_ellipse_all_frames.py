@@ -34,7 +34,7 @@ class TrackPoint:
 def read_video_frames(video_path: str) -> tuple[list[np.ndarray], float]:
     cap = cv2.VideoCapture(video_path)
     if not cap.isOpened():
-        raise ValueError(f"Impossible d'ouvrir la video: {video_path}")
+        raise ValueError(f"Unable to open video: {video_path}")
 
     fps = float(cap.get(cv2.CAP_PROP_FPS) or 25.0)
     frames: list[np.ndarray] = []
@@ -46,13 +46,13 @@ def read_video_frames(video_path: str) -> tuple[list[np.ndarray], float]:
 
     cap.release()
     if not frames:
-        raise ValueError("Aucune frame lisible dans la video")
+        raise ValueError("No readable frames in the video")
     return frames, fps
 
 
 def collect_initial_freehand_points(frame0: np.ndarray) -> list[tuple[int, int]]:
     tool = FreehandEllipseTool(frame0)
-    win = "AP Tracking - Trace initiale (Frame 1)"
+    win = "AP Tracking - Initial trace (Frame 1)"
 
     cv2.namedWindow(win, cv2.WINDOW_NORMAL)
     cv2.resizeWindow(win, 1400, 900)
@@ -60,8 +60,8 @@ def collect_initial_freehand_points(frame0: np.ndarray) -> list[tuple[int, int]]
 
     while True:
         canvas = tool.display.copy()
-        cv2.putText(canvas, "Trace initial de la zone a suivre", (20, 35), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 220, 255), 2, cv2.LINE_AA)
-        cv2.putText(canvas, "Entree: valider | R: reset | ESC: quitter", (20, 72), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2, cv2.LINE_AA)
+        cv2.putText(canvas, "Initial trace of the area to track", (20, 35), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 220, 255), 2, cv2.LINE_AA)
+        cv2.putText(canvas, "Enter: validate | R: reset | ESC: quit", (20, 72), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2, cv2.LINE_AA)
         cv2.imshow(win, canvas)
 
         key = cv2.waitKeyEx(20)
@@ -73,7 +73,7 @@ def collect_initial_freehand_points(frame0: np.ndarray) -> list[tuple[int, int]]
             continue
         if key in (13, 10):
             if len(tool.points) < 5:
-                print("Trace trop court, continue le contour.")
+                print("Trace too short, continue the contour.")
                 continue
             break
 
@@ -138,7 +138,7 @@ def draw_track_overlay(frame: np.ndarray, ellipse: Ellipse, frame_idx: int, tota
     cv2.circle(out, (int(round(ellipse[0][0])), int(round(ellipse[0][1]))), 3, (0, 255, 0), -1, cv2.LINE_AA)
     cv2.putText(out, f"Frame {frame_idx + 1}/{total}", (20, 35), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 255), 2, cv2.LINE_AA)
     cv2.putText(out, f"Source: {source}", (20, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (180, 255, 180), 2, cv2.LINE_AA)
-    cv2.putText(out, f"Seuil transition: +{pct}%", (20, 102), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (220, 220, 220), 2, cv2.LINE_AA)
+    cv2.putText(out, f"Transition threshold: +{pct}%", (20, 102), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (220, 220, 220), 2, cv2.LINE_AA)
     return out
 
 
@@ -146,7 +146,7 @@ def run_tracking(video_path: str, output_dir: Path, increase_pct: int, show_prev
     frames, fps = read_video_frames(video_path)
     initial_points = collect_initial_freehand_points(frames[0])
     if len(initial_points) < 5:
-        print("Tracking annule: aucun trace valide.")
+        print("Tracking canceled: no valid trace.")
         cv2.destroyAllWindows()
         return
 
@@ -163,7 +163,7 @@ def run_tracking(video_path: str, output_dir: Path, increase_pct: int, show_prev
         (w, h),
     )
     if not writer.isOpened():
-        raise RuntimeError(f"Impossible de creer la video de sortie: {video_path_out}")
+        raise RuntimeError(f"Unable to create the output video: {video_path_out}")
 
     track: list[TrackPoint] = []
 
@@ -172,7 +172,7 @@ def run_tracking(video_path: str, output_dir: Path, increase_pct: int, show_prev
         first_detected = fit_ellipse_from_points(initial_points)
     if first_detected is None:
         writer.release()
-        raise RuntimeError("Impossible d'initialiser l'ellipse sur la frame 1")
+        raise RuntimeError("Unable to initialize the ellipse on frame 1")
 
     current = first_detected
     track.append(TrackPoint(frame_index=0, ellipse=current, source="manual+refine"))
@@ -251,15 +251,15 @@ def run_tracking(video_path: str, output_dir: Path, increase_pct: int, show_prev
     }
     json_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
-    print(f"Tracking termine. Sorties: {output_dir}")
+    print(f"Tracking finished. Outputs: {output_dir}")
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Tracking d'ellipse AP sur toutes les frames d'une video.")
-    parser.add_argument("--video", default=DEFAULT_VIDEO, help="Chemin de la video AP")
-    parser.add_argument("--output", default=str(DEFAULT_OUTPUT_DIR), help="Dossier de sortie")
-    parser.add_argument("--increase-pct", type=int, default=15, help="Seuil de transition relatif en pourcentage")
-    parser.add_argument("--no-preview", action="store_true", help="Desactive la fenetre de preview pendant le tracking")
+    parser = argparse.ArgumentParser(description="AP ellipse tracking on all video frames.")
+    parser.add_argument("--video", default=DEFAULT_VIDEO, help="Path to the AP video")
+    parser.add_argument("--output", default=str(DEFAULT_OUTPUT_DIR), help="Output directory")
+    parser.add_argument("--increase-pct", type=int, default=15, help="Relative transition threshold in percentage")
+    parser.add_argument("--no-preview", action="store_true", help="Disable the preview window during tracking")
     return parser.parse_args()
 
 
@@ -267,4 +267,3 @@ if __name__ == "__main__":
     args = parse_args()
     pct = max(1, min(1000, int(args.increase_pct)))
     run_tracking(args.video, Path(args.output), pct, show_preview=not args.no_preview)
-
