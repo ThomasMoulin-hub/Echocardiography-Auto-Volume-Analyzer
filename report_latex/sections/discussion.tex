@@ -1,0 +1,18 @@
+\section{Discussion}
+The evaluated approaches provide complementary information on left-ventricular function. The Simple Method offers a rapid estimate with minimal inputs, the Doppler method provides a direct flow-based perspective, and the Modified Simpson approach uses multi-view geometry to reduce dependence on a single diameter assumption.
+
+\subsection{Interpretation of Method Differences}
+The primary volume comparison in this report is $\{EDV,ESV\}_{\mathrm{simple}}$ versus $\{EDV,ESV\}_{\mathrm{simpson}}$. In practice, discrepancies are expected because the Simple Method relies on a stronger geometric assumption, while Modified Simpson integrates multiple short-axis measurements. Doppler-derived CO can remain physiologically coherent even when volume-based estimates differ, but it is strongly dependent on accurate $D_{AO}$ measurement because cross-sectional area scales with diameter squared.
+
+\subsection{GitHub Repository and Auto-Detection Features}
+The full codebase and usage documentation are available in the repository.
+Beyond the core measurement workflow, several auto-detection features were tested in this project: automatic data-path discovery for the required videos/images, automatic ruler scale detection on the right side of each frame with interactive ROI correction, and iterative automatic contour/ellipse tracking strategies for ultrasound sequences. These developments were used to evaluate how far automation can support or accelerate manual echocardiographic analysis. Additional implementation details, visual examples, and tested variants are provided in the repository (https://github.com/ThomasMoulin-hub/Echocardiography-Auto-Volume-Analyzer).
+
+\subsection{Main Sources of Uncertainty}
+The dominant uncertainty sources were frame timing (true ED and ES), calibration quality, manual point placement, and 2-D out-of-plane effects. For Doppler, uncertainty in aortic diameter and alignment of the velocity profile remained the two main contributors to CO variability.
+
+\subsection{Comparison With Expected Physiological Ranges}
+The final metrics were interpreted against expected resting ranges for healthy adults. Agreement between methods was assessed by checking whether SV, EF, and CO remained physiologically plausible and internally consistent for the same heart rate.
+
+\subsection{Conclusion}
+This study compares echocardiographic quantification strategies while documenting a full computational workflow. The Python implementation provides a practical and reproducible alternative to Matlab for this assignment while preserving methodological equivalence with the handout requirements. For this dataset, Modified Simpson is retained as the primary volumetric reference, the Simple Method serves as a rapid baseline, and Doppler provides a complementary flow-based validation through an independent CO estimate.

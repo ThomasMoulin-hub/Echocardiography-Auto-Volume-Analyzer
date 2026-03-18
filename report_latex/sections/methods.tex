@@ -1,0 +1,70 @@
+\section{Materials and Methods}
+
+\subsection{Data and Software Environment}
+The analysis uses one apical four-chamber video and three short-axis videos (MV, PM, AP), together with Doppler measurements and heart rate recorded during the laboratory sessions. Processing was implemented in Python using a dedicated application (\texttt{main.py}, \texttt{heartvolume/gui/app.py}) and numerical routines in \texttt{heartvolume/core/calculations.py}.
+
+\subsection{Handout-Driven Analysis Logic}
+Following the Week 2\&3 instructions, the report compares three cardiac-function techniques: (i) Week 2 Simple Method for EDV/ESV, (ii) Week 2 Doppler method for flow-derived CO, and (iii) Week 3 Modified Simpson method for EDV/ESV. For volume-based methods (Simple and Simpson), SV, EF, and CO are computed from EDV and ESV. Doppler CO is computed independently from $VTI$, $HR$, and $D_{AO}$.
+
+\subsection{Week 2: Simple Method (2-D Geometric Approximation)}
+The first ventricular-volume approach is referred to as the \emph{Simple Method}. Assuming the ventricular cavity as a truncated axisymmetric ellipsoid, volume is estimated by
+\begin{equation}
+V = \frac{\pi}{6} D_{\mathrm{endo}}^2 L_{\mathrm{endo}}.
+\end{equation}
+The same formula was applied at end-diastole and end-systole to obtain $EDV_{\mathrm{simple}}$ and $ESV_{\mathrm{simple}}$, consistent with standard echocardiographic quantification practice \cite{schiller1989lv}.
+
+\subsection{Week 2: Balloon Phantom Formula}
+The balloon is modeled as an ellipsoid with major axis $L$ and orthogonal minor axes $D_1$ and $D_2$:
+\begin{equation}
+V_{\mathrm{balloon}} = \frac{4}{3}\pi\left(\frac{L}{2}\right)\left(\frac{D_1}{2}\right)\left(\frac{D_2}{2}\right) = \frac{\pi}{6} L D_1 D_2.
+\end{equation}
+In this report, four sets of measurements are provided. Each set is used to compute an estimated balloon volume, then absolute and relative errors versus the known injected volume.
+
+\subsection{Week 2: Doppler-Derived Cardiac Output}
+Cardiac output from aortic outflow was computed as
+\begin{equation}
+CO_{\mathrm{Doppler}} = VTI \times HR \times \frac{\pi D_{AO}^2}{4}.
+\end{equation}
+The aortic diameter was measured directly on the D\_AO image/video after calibration, and VTI and HR were entered from the acquisition session.
+
+\subsection{Week 3: Modified Simpson Method Implemented in Python}
+The Python workflow reproduces the Week 3 procedure with interactive frame selection and calibrated manual measurements:
+\begin{itemize}
+    \item frame extraction from the four synchronized views;
+    \item automatic or manual scale calibration in cm/pixel;
+    \item manual distance measurements on ED and ES frames;
+    \item modified Simpson volume computation through \texttt{calculate\_volume\_simpson}.
+\end{itemize}
+For each cardiac phase, the implementation uses long-axis length $L$ and the three short-axis diameters at apex, papillary muscle, and mitral valve levels. Using areas $A_{\mathrm{AP}}$, $A_{\mathrm{PM}}$, and $A_{\mathrm{MV}}$,
+\begin{equation}
+V_{\mathrm{Simpson}} = \frac{L}{3}\times\frac{A_{\mathrm{AP}} + A_{\mathrm{MV}} + 4A_{\mathrm{PM}}}{3},
+\end{equation}
+with
+\begin{equation}
+A_i = \pi\left(\frac{D_i}{2}\right)^2, \quad i\in\{\mathrm{AP},\mathrm{PM},\mathrm{MV}\}.
+\end{equation}
+This provides $EDV_{\mathrm{simpson}}$ and $ESV_{\mathrm{simpson}}$.
+
+\subsection{Derived Metrics and Comparison Framework}
+For each volume-based method (Simple and Modified Simpson), stroke volume and ejection fraction were computed as
+\begin{align}
+SV &= EDV - ESV, \\
+EF &= \frac{SV}{EDV} \times 100, \\
+CO &= SV \times HR.
+\end{align}
+Thus, three cardiac output estimates are compared in this report:
+\begin{itemize}
+    \item $CO_{\mathrm{simple}} = SV_{\mathrm{simple}} \times HR$,
+    \item $CO_{\mathrm{simpson}} = SV_{\mathrm{simpson}} \times HR$,
+    \item $CO_{\mathrm{doppler}} = VTI \times HR \times (\pi D_{AO}^2/4)$.
+\end{itemize}
+The full comparison is therefore organized as follows:
+\begin{itemize}
+    \item compare ventricular volumes from Simple Method vs Modified Simpson,
+    \item compare cardiac output from Simple vs Modified Simpson vs Doppler,
+    \item compare balloon estimated volume vs true balloon volume (250 mL).
+\end{itemize}
+In the Python code, \texttt{build\_volume\_result} and \texttt{build\_doppler\_result} centralize these calculations and standardize units (mL and L/min) for consistent reporting across methods.
+
+\subsection{Error Analysis Strategy}
+Method comparison focused on sensitivity to manual annotations, frame selection, calibration quality, and geometric assumptions. Differences between methods were interpreted by considering expected physiological ranges and known acquisition-related sources of bias.

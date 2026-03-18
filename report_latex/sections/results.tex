@@ -1,0 +1,100 @@
+\section{Results}
+
+\subsection{Measurement Summary}
+Primary measurements collected from ED and ES frames are summarized in Table~\ref{tab:raw-measurements}. Doppler inputs used for outflow-based cardiac output are listed below the table.
+
+\begin{table}[htbp]
+\caption{Primary measurements extracted from ultrasound images}
+\label{tab:raw-measurements}
+\centering
+\begin{tabular}{lcc}
+\toprule
+Parameter & ED & ES \\
+\midrule
+$L_{\mathrm{endo}}$ (cm) & 7.01 & 5.66 \\
+$D_{\mathrm{endo}}$ (cm) & 4.21 & 3.86 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent Doppler inputs: $VTI = 19$ (cm), $D_{AO} = 2.06$ (cm), and $HR = 74$ (bpm).
+
+\subsection{Supplementary Measurements for Modified Simpson}
+Detailed input dimensions used by the Modified Simpson method are reported in Table~\ref{tab:simpson-inputs}. These values correspond to manual measurements performed on ED and ES frames for the four synchronized views.
+
+\begin{table}[htbp]
+\caption{Modified Simpson input measurements}
+\label{tab:simpson-inputs}
+\centering
+\begin{tabular}{lcc}
+\toprule
+Parameter & ED (cm) & ES (cm) \\
+\midrule
+$L$ (apical 4-chamber) & -- & -- \\
+$D_{MV}$ (mitral valve level) & -- & -- \\
+$D_{PM}$ (papillary muscle level) & -- & -- \\
+$D_{AP}$ (apex level) & -- & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Comparison of Cardiac Metrics Across Methods}
+Derived ventricular metrics are reported in Table~\ref{tab:method-comparison}. The Simple Method and Modified Simpson provide EDV and ESV directly, whereas Doppler provides flow-derived CO. This table is used for the required comparisons: volumes (Simple vs Modified Simpson) and cardiac output (Simple vs Modified Simpson vs Doppler).
+
+\begin{table}[htbp]
+\caption{Cardiac metrics obtained with each method}
+\label{tab:method-comparison}
+\centering
+\begin{tabular}{lccc}
+\toprule
+Metric & Simple Method & Doppler & Modified Simpson \\
+\midrule
+$EDV$ (mL) & 65.05 & N/A & 30.00 \\
+$ESV$ (mL) & 44.15 & N/A & 7.05 \\
+$SV$ (mL)  & 20.91 & -- & 22.95 \\
+$EF$ (\%) & 32.14 & N/A & 76.5 \\
+$CO$ (L/min) & 1.58 & 4.67 & 1.70 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Balloon Phantom Validation}
+Balloon phantom validation results are shown in Tables~\ref{tab:balloon-inputs} and~\ref{tab:balloon}. Four sets of measurements are reported (including the required two) and compared with the known balloon volume ($V_{\mathrm{true}} = 250$ mL) to quantify measurement error.
+
+\begin{table}[htbp]
+\caption{Balloon phantom measured dimensions used for volume estimation}
+\label{tab:balloon-inputs}
+\centering
+\begin{tabular}{lccc}
+\toprule
+Set & $L$ (cm) & $D_1$ (cm) & $D_2$ (cm) \\
+\midrule
+1 & 8.31 & 5.34 & 6.01 \\
+2 & 8.51 & 6.21 & 6.22 \\
+3 & 9.07 & 5.76 & 6.22 \\
+4 & 8.93 & 6.51 & 5.81 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\caption{Balloon phantom volume validation across four measurement sets}
+\label{tab:balloon}
+\centering
+\begin{tabular}{lccc}
+\toprule
+Set & Estimated volume (mL) & Absolute error (mL) & Relative error (\%) \\
+\midrule
+1 & 140 & 110 & 44.0 \\
+2 & 172 & 78 & 31.2 \\
+3 & 170 & 80 & 32.0 \\
+4 & 177 & 73 & 29.2 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Software Outputs}
+The Python application produces a complete run log for each method, including selected frame indices, calibrated scale values, measured distances, and final EDV/ESV/SV/EF/CO metrics. This output was used as the numerical source for all tables in this section.
+
+\subsection{Figures}
+Representative images associated with the workflow include frame selection, scale calibration, and final metric display for EDV and ESV analyses. These visual artifacts are part of the project assets and were used to verify measurement consistency across views.

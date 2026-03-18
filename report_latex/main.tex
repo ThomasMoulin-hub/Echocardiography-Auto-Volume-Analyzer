@@ -1,0 +1,44 @@
+\documentclass[conference]{IEEE-conference-template-062824/IEEEtran}
+\IEEEoverridecommandlockouts
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{siunitx}
+\usepackage{url}
+
+
+\title{Evaluation of Left Ventricular Metrics Using Echocardiography\\
+\large BMEN 6003 -- Module 2 Report}
+
+\author{\IEEEauthorblockN{Thomas Moulin}
+\IEEEauthorblockA{Columbia University\\
+New York, NY, USA\\
+tmm2219}}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This report compares three approaches to estimate cardiac metrics from ultrasound data: geometric approximation from 2-D views, Doppler-based cardiac output, and a modified Simpson method implemented in Python. The workflow estimates end-diastolic and end-systolic ventricular volumes and derives stroke volume, ejection fraction, and cardiac output. The study also documents the software implementation used to perform frame selection, scale calibration, manual measurements, and final metric computation.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Echocardiography, left ventricle, stroke volume, ejection fraction, modified Simpson method, Doppler.
+\end{IEEEkeywords}
+
+\input{sections/introduction}
+\input{sections/methods}
+\input{sections/results}
+\input{sections/discussion}
+\input{sections/appendix_code}
+
+\nocite{*}
+\bibliographystyle{IEEEtranBST2/IEEEtran}
+\bibliography{references}
+
+\end{document}
+

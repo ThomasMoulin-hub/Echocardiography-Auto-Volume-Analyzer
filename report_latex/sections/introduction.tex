@@ -1,0 +1,10 @@
+\section{Introduction}
+Cardiovascular ultrasound is a standard noninvasive tool to evaluate ventricular morphology and function in clinical practice \cite{feigenbaum_echo}. In this module, left-ventricular function was assessed from volunteer echocardiography data acquired during Week 2 and processed during Week 3.
+
+The report addresses the metrics determination through three complementary approaches: (1) a geometric 2-D approximation of ventricular volume, (2) a Doppler-based estimate of cardiac output, and (3) a modified Simpson approach based on long-axis and short-axis views.
+
+\subsection{Background and Hypothesis}
+Single-view geometric methods are fast but sensitive to shape assumptions and manual measurement uncertainty. Doppler methods estimate flow directly but are sensitive to outflow tract diameter and insonation conditions. The modified Simpson method combines multiple short-axis measurements and is therefore expected to provide more robust EDV and ESV estimates for the same subject.
+
+\subsection{Objective}
+The objective is to compare EDV, ESV, SV, EF, and CO across the methods, identify the main sources of uncertainty, and document a reproducible Python implementation used to obtain these metrics.
