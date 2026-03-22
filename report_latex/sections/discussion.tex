@@ -6,13 +6,28 @@ The primary volume comparison in this report is $\{EDV,ESV\}_{\mathrm{simple}}$ 
 
 \subsection{GitHub Repository and Auto-Detection Features}
 The full codebase and usage documentation are available in the repository.
-Beyond the core measurement workflow, several auto-detection features were tested in this project: automatic data-path discovery for the required videos/images, automatic ruler scale detection on the right side of each frame with interactive ROI correction, and iterative automatic contour/ellipse tracking strategies for ultrasound sequences. These developments were used to evaluate how far automation can support or accelerate manual echocardiographic analysis. Additional implementation details, visual examples, and tested variants are provided in the repository (https://github.com/ThomasMoulin-hub/Echocardiography-Auto-Volume-Analyzer).
+Beyond the core measurement workflow, several auto-detection features were tested in this project: automatic data-path discovery for the required videos/images, automatic ruler scale detection on the right side of each frame with interactive ROI correction, and iterative automatic contour/ellipse tracking strategies for ultrasound sequences. These developments were used to evaluate how far automation can support or accelerate manual echocardiographic analysis. Additional implementation details, visual examples, and tested variants are provided in the \href{https://github.com/ThomasMoulin-hub/Echocardiography-Auto-Volume-Analyzer}{\uline{repository}}.
+
+\subsection{Experimental Automatic Contour Tracking}
+Beyond the semi-automated workflow, several fully automatic contour tracking methods were explored to segment the left ventricle. These features remain experimental as they did not yield results robust enough for clinical use, but they highlight common challenges in echocardiographic image processing. Three main approaches were investigated:
+
+\begin{enumerate}
+    \item \textbf{Threshold-based Region Growing \& Ellipse Fitting:} This classical computer vision method starts from a user-drawn contour on the first frame. An algorithm then iteratively expands the region by analyzing brightness differences between the inner cavity and an outer ring, aiming to detect the endocardium wall. An ellipse is fitted to the resulting contour. On subsequent frames, the ellipse from the previous frame is used as a seed. While functional on high-contrast images, this method struggles significantly with the speckle noise and signal dropouts characteristic of clinical ultrasound data.
+
+    \item \textbf{Optical Flow (Lucas-Kanade):} This approach attempted to track keypoints along the manually-traced endocardium border across frames. Using the Lucas-Kanade optical flow algorithm, the displacement of these points was calculated. However, this method proved unreliable. The constantly changing speckle pattern (speckle noise decorrelation) of the myocardial tissue causes the tracked points to drift away from the anatomical border rapidly.
+
+    \item \textbf{Deep Learning (EchoNet-Dynamic):} A state-of-the-art deep learning model, EchoNet-Dynamic, was also evaluated. This model is a segmentation architecture specifically trained on thousands of apical four-chamber echocardiograms. Surprisingly, this approach was the least conclusive on the available dataset, which may be attributed to the low quality of the input videos compared to the model's training data.
+\end{enumerate}
+
+These experiments confirm that robust, automated segmentation of the left ventricule in noisy ultrasound sequences is a complex task that typically requires more advanced, dedicated models and high-quality image acquisition. More details can be found in the \href{https://github.com/ThomasMoulin-hub/Echocardiography-Auto-Volume-Analyzer}{\uline{github repository}}.
 
 \subsection{Main Sources of Uncertainty}
 The dominant uncertainty sources were frame timing (true ED and ES), calibration quality, manual point placement, and 2-D out-of-plane effects. For Doppler, uncertainty in aortic diameter and alignment of the velocity profile remained the two main contributors to CO variability.
 
 \subsection{Comparison With Expected Physiological Ranges}
-The final metrics were interpreted against expected resting ranges for healthy adults. Agreement between methods was assessed by checking whether SV, EF, and CO remained physiologically plausible and internally consistent for the same heart rate.
+The final metrics were interpreted against expected resting ranges for healthy adults. The Doppler-based cardiac output (CO) aligns well with typical physiological expectations. In contrast, the CO values derived from both the Simple Method and the Modified Simpson method are approximately half of the expected value, although they are consistent with each other.
+
+This large discrepancy likely originates from the manual annotation process. Accurate placement of measurement points on echocardiographic images is a challenging task that requires significant clinical expertise to correctly identify anatomical landmarks, especially in the presence of image noise and artifacts. As a novice, it is highly probable that my manual measurements for ventricular diameters and lengths were systematically underestimated, leading to erroneously low volume calculations and, consequently, a cardiac output that is not representative of the true physiological state. This highlights the critical role of operator experience in achieving reliable quantitative results from echocardiography.
 
 \subsection{Conclusion}
 This study compares echocardiographic quantification strategies while documenting a full computational workflow. The Python implementation provides a practical and reproducible alternative to Matlab for this assignment while preserving methodological equivalence with the handout requirements. For this dataset, Modified Simpson is retained as the primary volumetric reference, the Simple Method serves as a rapid baseline, and Doppler provides a complementary flow-based validation through an independent CO estimate.
